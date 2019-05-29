@@ -1,6 +1,6 @@
 # Yocto-Flic
 
-Yocto-Flic is a small python application which leverages the [Fliclib SDK](http://github.com/50ButtonsEach)to interface Yoctopuce devices with [Flic buttons](http://flic.io). More info on  [Yoctopouce's web site](https://www.yoctopuce.com/EN/article/driving-yoctopuce-modules-with-flic-buttons)
+Yocto-Flic is a small python application which leverages the [Fliclib SDK](http://github.com/50ButtonsEach) to interface Yoctopuce devices with [Flic buttons](http://flic.io). More info on  [Yoctopuce's web site](https://www.yoctopuce.com/EN/article/driving-yoctopuce-modules-with-flic-buttons)
 
 ![Screenshot example](http://www.yoctopuce.com/pubarchive/2019-05/Yocto-flic-banner_1.jpg)
 
@@ -13,7 +13,7 @@ Supported functions are
   - Buzzer ([Yocto-Buzzer](http://www.yoctopuce.com/EN/products/yocto-Buzzer))
  
 # Requirement
-This application as been developed on a Raspberry PI 3 B+, it might work on other system, as long as they feature a bluetooth adapter, but we didn't try. 
+This application as been developed on a Raspberry PI 3 B+, it might work on other systems, as long as they feature a bluetooth adapter, but we didn't try. 
 
 # Installation
 Download and install the [Fliclib SDK for Linux](https://github.com/50ButtonsEach/fliclib-linux-dist), read the [readme.md](https://github.com/50ButtonsEach/fliclib-linux-dist/blob/master/README.md) file. Position yourself in the  _bin/armv6l/_  folder and  make sure the Flic server can access the Bluetooth stack (you only need to do that once) by typing 
