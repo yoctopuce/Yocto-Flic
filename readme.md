@@ -16,17 +16,24 @@ Supported functions are
 This application as been developed on a Raspberry PI 3 B+, it might work on other systems, as long as they feature a bluetooth adapter, but we didn't try. 
 
 # Installation
-Download and install the [Fliclib SDK for Linux](https://github.com/50ButtonsEach/fliclib-linux-dist), read the [readme.md](https://github.com/50ButtonsEach/fliclib-linux-dist/blob/master/README.md) file. Position yourself in the  _bin/armv6l/_  folder and  make sure the Flic server can access the Bluetooth stack (you only need to do that once) by typing 
+Download and copy the [Fliclib SDK for Linux](https://github.com/50ButtonsEach/fliclib-linux-hci) files whenever you want. Read the [readme.md](https://github.com/50ButtonsEach/fliclib-linux-dist/blob/master/README.md) file. Position yourself in the  _bin/armv6l/_  folder and  make sure the Flic server can access the Bluetooth stack (you only need to do that once) by typing 
 
 ```sh
 $ sudo setcap cap_net_admin=ep ./flicd
 ```
-then start the Flic server
+then start the Flic server from *bin* directory
 
 ```sh
 $ ./flicd -f flic.sqlite3
 ```
-Download and install the _Yocto-Flic_ files, and start the Yocto-Flic Script
+
+To make sure that the Flic button server if working properly, start the *new_scan_wizard* python script and follow instructions
+```sh
+$ python3 fliclib/clientlib/python/new_scan_wizard.py
+```
+Note : *flicd* will create a *flic.sqlite3* file, make sure that file permissions are properly set, especially if you plan to start the server at boot up.  
+
+Download and copy the _Yocto-Flic_ files when ever you want, and start the Yocto-Flic Script
  
 ```sh
 $ python3 Yocto-flic.py
