@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ********************************************************************
 #
-#  $Id: yocto_buzzer.py 34289 2019-02-03 21:12:49Z mvuilleu $
+#  $Id: yocto_buzzer.py 50689 2022-08-17 14:37:15Z mvuilleu $
 #
 #  Implements yFindBuzzer(), the high-level API for Buzzer functions
 #
@@ -48,8 +48,8 @@ from yocto_api import *
 #noinspection PyProtectedMember
 class YBuzzer(YFunction):
     """
-    The Yoctopuce application programming interface allows you to
-    choose the frequency and volume at which the buzzer must sound.
+    The YBuzzer class allows you to drive a buzzer. You can
+    choose the frequency and the volume at which the buzzer must sound.
     You can also pre-program a play sequence.
 
     """
@@ -85,7 +85,7 @@ class YBuzzer(YFunction):
     #--- (YBuzzer implementation)
     def _parseAttr(self, json_val):
         if json_val.has("frequency"):
-            self._frequency = round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0
+            self._frequency = round(json_val.getDouble("frequency") / 65.536) / 1000.0
         if json_val.has("volume"):
             self._volume = json_val.getInt("volume")
         if json_val.has("playSeqSize"):
@@ -143,7 +143,8 @@ class YBuzzer(YFunction):
 
     def set_volume(self, newval):
         """
-        Changes the volume of the signal sent to the buzzer/speaker.
+        Changes the volume of the signal sent to the buzzer/speaker. Remember to call the
+        saveToFlash() method of the module if the modification must be kept.
 
         @param newval : an integer corresponding to the volume of the signal sent to the buzzer/speaker
 
@@ -239,7 +240,8 @@ class YBuzzer(YFunction):
         you are certain that the matching device is plugged, make sure that you did
         call registerHub() at application initialization time.
 
-        @param func : a string that uniquely characterizes the buzzer
+        @param func : a string that uniquely characterizes the buzzer, for instance
+                YBUZZER2.buzzer.
 
         @return a YBuzzer object allowing you to drive the buzzer.
         """

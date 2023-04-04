@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ********************************************************************
 #
-#  $Id: yocto_voltageoutput.py 33717 2018-12-14 14:22:04Z seb $
+#  $Id: yocto_voltageoutput.py 50689 2022-08-17 14:37:15Z mvuilleu $
 #
 #  Implements yFindVoltageOutput(), the high-level API for VoltageOutput functions
 #
@@ -47,7 +47,7 @@ from yocto_api import *
 #noinspection PyProtectedMember
 class YVoltageOutput(YFunction):
     """
-    The Yoctopuce application programming interface allows you to change the value of the voltage output.
+    The YVoltageOutput class allows you to drive a voltage output.
 
     """
     #--- (end of YVoltageOutput class start)
@@ -76,11 +76,11 @@ class YVoltageOutput(YFunction):
     #--- (YVoltageOutput implementation)
     def _parseAttr(self, json_val):
         if json_val.has("currentVoltage"):
-            self._currentVoltage = round(json_val.getDouble("currentVoltage") * 1000.0 / 65536.0) / 1000.0
+            self._currentVoltage = round(json_val.getDouble("currentVoltage") / 65.536) / 1000.0
         if json_val.has("voltageTransition"):
             self._voltageTransition = json_val.getString("voltageTransition")
         if json_val.has("voltageAtStartUp"):
-            self._voltageAtStartUp = round(json_val.getDouble("voltageAtStartUp") * 1000.0 / 65536.0) / 1000.0
+            self._voltageAtStartUp = round(json_val.getDouble("voltageAtStartUp") / 65.536) / 1000.0
         super(YVoltageOutput, self)._parseAttr(json_val)
 
     def set_currentVoltage(self, newval):
@@ -177,7 +177,8 @@ class YVoltageOutput(YFunction):
         you are certain that the matching device is plugged, make sure that you did
         call registerHub() at application initialization time.
 
-        @param func : a string that uniquely characterizes the voltage output
+        @param func : a string that uniquely characterizes the voltage output, for instance
+                TX010V01.voltageOutput1.
 
         @return a YVoltageOutput object allowing you to drive the voltage output.
         """

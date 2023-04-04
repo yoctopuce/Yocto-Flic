@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ********************************************************************
 #
-#  $Id: yocto_relay.py 34976 2019-04-05 06:47:49Z seb $
+#  $Id: yocto_relay.py 41109 2020-06-29 12:40:42Z seb $
 #
 #  Implements yFindRelay(), the high-level API for Relay functions
 #
@@ -47,13 +47,12 @@ from yocto_api import *
 #noinspection PyProtectedMember
 class YRelay(YFunction):
     """
-    The Yoctopuce application programming interface allows you to switch the relay state.
-    This change is not persistent: the relay will automatically return to its idle position
-    whenever power is lost or if the module is restarted.
-    The library can also generate automatically short pulses of determined duration.
+    The YRelay class allows you to drive a Yoctopuce relay or optocoupled output.
+    It can be used to simply switch the output on or off, but also to automatically generate short
+    pulses of determined duration.
     On devices with two output for each relay (double throw), the two outputs are named A and B,
-    with output A corresponding to the idle position (at power off) and the output B corresponding to the
-    active state. If you prefer the alternate default state, simply switch your cables on the board.
+    with output A corresponding to the idle position (normally closed) and the output B corresponding to the
+    active state (normally open).
 
     """
     #--- (end of YRelay class start)
@@ -156,12 +155,12 @@ class YRelay(YFunction):
 
     def get_stateAtPowerOn(self):
         """
-        Returns the state of the relays at device startup (A for the idle position, B for the active
-        position, UNCHANGED for no change).
+        Returns the state of the relays at device startup (A for the idle position,
+        B for the active position, UNCHANGED to leave the relay state as is).
 
         @return a value among YRelay.STATEATPOWERON_UNCHANGED, YRelay.STATEATPOWERON_A and
-        YRelay.STATEATPOWERON_B corresponding to the state of the relays at device startup (A for the idle
-        position, B for the active position, UNCHANGED for no change)
+        YRelay.STATEATPOWERON_B corresponding to the state of the relays at device startup (A for the idle position,
+                B for the active position, UNCHANGED to leave the relay state as is)
 
         On failure, throws an exception or returns YRelay.STATEATPOWERON_INVALID.
         """
@@ -174,12 +173,14 @@ class YRelay(YFunction):
 
     def set_stateAtPowerOn(self, newval):
         """
-        Preset the state of the relays at device startup (A for the idle position,
-        B for the active position, UNCHANGED for no modification). Remember to call the matching module saveToFlash()
+        Changes the state of the relays at device startup (A for the idle position,
+        B for the active position, UNCHANGED to leave the relay state as is).
+        Remember to call the matching module saveToFlash()
         method, otherwise this call will have no effect.
 
         @param newval : a value among YRelay.STATEATPOWERON_UNCHANGED, YRelay.STATEATPOWERON_A and
-        YRelay.STATEATPOWERON_B
+        YRelay.STATEATPOWERON_B corresponding to the state of the relays at device startup (A for the idle position,
+                B for the active position, UNCHANGED to leave the relay state as is)
 
         @return YAPI.SUCCESS if the call succeeds.
 
@@ -190,10 +191,11 @@ class YRelay(YFunction):
 
     def get_maxTimeOnStateA(self):
         """
-        Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
-        switching back in to B state. Zero means no maximum time.
+        Returns the maximum time (ms) allowed for the relay to stay in state
+        A before automatically switching back in to B state. Zero means no time limit.
 
-        @return an integer
+        @return an integer corresponding to the maximum time (ms) allowed for the relay to stay in state
+                A before automatically switching back in to B state
 
         On failure, throws an exception or returns YRelay.MAXTIMEONSTATEA_INVALID.
         """
@@ -206,10 +208,13 @@ class YRelay(YFunction):
 
     def set_maxTimeOnStateA(self, newval):
         """
-        Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
-        switching back in to B state. Use zero for no maximum time.
+        Changes the maximum time (ms) allowed for the relay to stay in state A
+        before automatically switching back in to B state. Use zero for no time limit.
+        Remember to call the saveToFlash()
+        method of the module if the modification must be kept.
 
-        @param newval : an integer
+        @param newval : an integer corresponding to the maximum time (ms) allowed for the relay to stay in state A
+                before automatically switching back in to B state
 
         @return YAPI.SUCCESS if the call succeeds.
 
@@ -220,8 +225,8 @@ class YRelay(YFunction):
 
     def get_maxTimeOnStateB(self):
         """
-        Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
-        switching back in to A state. Zero means no maximum time.
+        Retourne the maximum time (ms) allowed for the relay to stay in state B
+        before automatically switching back in to A state. Zero means no time limit.
 
         @return an integer
 
@@ -236,10 +241,14 @@ class YRelay(YFunction):
 
     def set_maxTimeOnStateB(self, newval):
         """
-        Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
-        switching back in to A state. Use zero for no maximum time.
+        Changes the maximum time (ms) allowed for the relay to stay in state B before
+        automatically switching back in to A state. Use zero for no time limit.
+        Remember to call the saveToFlash()
+        method of the module if the modification must be kept.
 
-        @param newval : an integer
+        @param newval : an integer corresponding to the maximum time (ms) allowed for the relay to stay in
+        state B before
+                automatically switching back in to A state
 
         @return YAPI.SUCCESS if the call succeeds.
 
@@ -382,7 +391,8 @@ class YRelay(YFunction):
         you are certain that the matching device is plugged, make sure that you did
         call registerHub() at application initialization time.
 
-        @param func : a string that uniquely characterizes the relay
+        @param func : a string that uniquely characterizes the relay, for instance
+                YLTCHRL1.relay1.
 
         @return a YRelay object allowing you to drive the relay.
         """

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ********************************************************************
 #
-#  $Id: yocto_currentloopoutput.py 33717 2018-12-14 14:22:04Z seb $
+#  $Id: yocto_currentloopoutput.py 50689 2022-08-17 14:37:15Z mvuilleu $
 #
 #  Implements yFindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
 #
@@ -47,8 +47,9 @@ from yocto_api import *
 #noinspection PyProtectedMember
 class YCurrentLoopOutput(YFunction):
     """
-    The Yoctopuce application programming interface allows you to change the value of the 4-20mA
-    output as well as to know the current loop state.
+    The YCurrentLoopOutput class allows you to drive a 4-20mA output
+    by regulating the current flowing through the current loop.
+    It can also provide information about the power state of the current loop.
 
     """
     #--- (end of YCurrentLoopOutput class start)
@@ -82,11 +83,11 @@ class YCurrentLoopOutput(YFunction):
     #--- (YCurrentLoopOutput implementation)
     def _parseAttr(self, json_val):
         if json_val.has("current"):
-            self._current = round(json_val.getDouble("current") * 1000.0 / 65536.0) / 1000.0
+            self._current = round(json_val.getDouble("current") / 65.536) / 1000.0
         if json_val.has("currentTransition"):
             self._currentTransition = json_val.getString("currentTransition")
         if json_val.has("currentAtStartUp"):
-            self._currentAtStartUp = round(json_val.getDouble("currentAtStartUp") * 1000.0 / 65536.0) / 1000.0
+            self._currentAtStartUp = round(json_val.getDouble("currentAtStartUp") / 65.536) / 1000.0
         if json_val.has("loopPower"):
             self._loopPower = json_val.getInt("loopPower")
         super(YCurrentLoopOutput, self)._parseAttr(json_val)
@@ -205,7 +206,8 @@ class YCurrentLoopOutput(YFunction):
         you are certain that the matching device is plugged, make sure that you did
         call registerHub() at application initialization time.
 
-        @param func : a string that uniquely characterizes the 4-20mA output
+        @param func : a string that uniquely characterizes the 4-20mA output, for instance
+                TX420MA1.currentLoopOutput.
 
         @return a YCurrentLoopOutput object allowing you to drive the 4-20mA output.
         """

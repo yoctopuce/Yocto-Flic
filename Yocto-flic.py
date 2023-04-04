@@ -15,13 +15,15 @@ if  pythonVersion  < 3.3:
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 import fliclib
-import _thread
+from threading import Thread
 from yocto_api import *
 from yocto_relay import *
 from yocto_buzzer import *
 from yocto_servo  import *
 from yocto_voltageoutput import *
 from yocto_currentloopoutput import *
+from yocto_wakeupmonitor import *
+
 
 
 import xml.etree.ElementTree as ET
@@ -39,7 +41,7 @@ buttonHandler = None
 yoctoHandler = None
 yoctoConnectionHandler = None
 saveAllowed =False
-stopPlz = False;
+stopPlz = False
 
 # thanks  Jamieson Becker @ stackoverflow
 def get_ip():
@@ -152,10 +154,10 @@ class YDeviceAction:
       self._params = params
 
     def get_id(self):
-       return self._id;
+       return self._id
 
     def get_params(self):
-       return self._params;
+       return self._params
 
     def  toJson(self):
       res= quote(self._id)+':{"Desc":'+quote(self._description)+',"params":'
@@ -185,7 +187,7 @@ class YoctoRelay(YoctoFunction):
    def  getJsonCode(self):
       return super(YoctoRelay,self).getJsonCode( "")
 
-   def getCapability():
+   def getCapability(self):
 
       return '"Relay":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoRelay.capabilities)+'}}'
 
@@ -202,7 +204,7 @@ class YoctoRelay(YoctoFunction):
        else:
             log( self._hwdid + "is offline, action canceled")
 
-   def staticInit():
+   def staticInit(self):
        YoctoRelay.capabilities.append(YDeviceAction("TOGGLE","Toggle",None))
        YoctoRelay.capabilities.append(YDeviceAction("SWITCHB","Switch to B",None))
        YoctoRelay.capabilities.append(YDeviceAction("SWITCHA","Switch to A",None))
@@ -210,7 +212,49 @@ class YoctoRelay(YoctoFunction):
 
    def checkActionValidity(targetType, action, params):
        if targetType!="Relay" : return False
-       return YoctoFunction.checkActionValidity( YoctoRelay.capabilities,action,params);
+       return YoctoFunction.checkActionValidity( YoctoRelay.capabilities,action,params)
+
+
+#
+#  ************ WAKEUP MONITOR SUPPORT
+#
+
+class YoctoWakeUpMonitor(YoctoFunction):
+
+   capabilities = []
+
+   def __init__ (self,hwid, type, isOnline,fname):
+      log("new  WakeUpMonitor "+hwid)
+      super( YoctoWakeUpMonitor,self).__init__(hwid,YWakeUpMonitor.FindWakeUpMonitor(hwid),type,isOnline,fname)
+      self._type="WakeUpMonitor"
+
+   def  getJsonCode(self):
+      return super(YoctoWakeUpMonitor,self).getJsonCode( "")
+
+   def getCapability(self):
+
+      return '"WakeUpMonitor":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoWakeUpMonitor.capabilities)+'}}'
+
+   def executeAction(self, action, params):
+       log("executeAction "+action+"("+str(params)+")")
+       if self._function.isOnline():
+           try:
+            if action=="SLEEP" : self._function.sleep(1)
+            elif action=="SLEEPFOR"   and len(params)>=1: self._function.sleepFor(int(params[0]))
+
+           except  Exception as e :
+            log ("WakeUpMonitor action "+action+" failed: "+str(e))
+       else:
+            log( self._hwdid + "is offline, action canceled")
+
+   def staticInit(self):
+       YoctoWakeUpMonitor.capabilities.append(YDeviceAction("SLEEP","Sleep",None))
+       YoctoWakeUpMonitor.capabilities.append(YDeviceAction("SLEEPFOR","Sleep for",[YDeviceActionParam("Duration",3600,"s","")]))
+
+
+   def checkActionValidity(targetType, action, params):
+       if targetType!="WakeUpMonitor" : return False
+       return YoctoFunction.checkActionValidity( YoctoWakeUpMonitor.capabilities,action,params)
 
 
 #
@@ -229,7 +273,7 @@ class YoctoBuzzer(YoctoFunction):
     def  getJsonCode(self):
         return super(YoctoBuzzer,self).getJsonCode( "")
 
-    def getCapability():
+    def getCapability(self):
         return '"Buzzer":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoBuzzer.capabilities)+'}}'
 
     def executeAction(self, action, params):
@@ -243,7 +287,7 @@ class YoctoBuzzer(YoctoFunction):
         else:
             log( self._hwdid + "is offline, action canceled")
 
-    def staticInit():
+    def staticInit(self):
         YoctoBuzzer.capabilities.append(YDeviceAction("PULSE","Pulse",[YDeviceActionParam("Frequence",1000,"Hz",""),YDeviceActionParam("Duration",1500,"ms",""),  ]))
         YoctoBuzzer.capabilities.append(YDeviceAction("PLAY","Play tune",[YDeviceActionParam("Notes","200% D8! C! D! A! F! A! ,D4! ","","Tune to play, more info about syntax on <a href='http://http://www.yoctopuce.com/EN/article/fancy-ringtones-for-the-yocto-buzzer'>Yoctopuce web site</a>.")]))
 
@@ -271,7 +315,7 @@ class YoctoServo(YoctoFunction):
     def  getJsonCode(self):
         return super(YoctoServo,self).getJsonCode( "")
 
-    def getCapability():
+    def getCapability(self):
         return '"Servo":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoServo.capabilities)+'}}'
 
     def executeAction(self, action, params):
@@ -301,7 +345,7 @@ class YoctoServo(YoctoFunction):
         else:
             log( self._hwdid + "is offline, action canceled")
 
-    def staticInit():
+    def staticInit(self):
         YoctoServo.capabilities.append(YDeviceAction("MOVE","Move",[YDeviceActionParam("Position",1000,"",""),YDeviceActionParam("Speed",100,"%/s",""),  ]))
         YoctoServo.capabilities.append(YDeviceAction("TOGGLE","Toggle",[YDeviceActionParam("Position 1",-1000,"",""),YDeviceActionParam("Position 2",1000,"",""),YDeviceActionParam("Speed",100,"%/s","The servo will toggle between position 1 & 2 at specified speed"),  ]))
 
@@ -325,7 +369,7 @@ class YoctoVoltageOutput(YoctoFunction):
     def  getJsonCode(self):
         return super(YoctoVoltageOutput,self).getJsonCode( "")
 
-    def getCapability():
+    def getCapability(self):
         return '"VoltageOutput":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoVoltageOutput.capabilities)+'}}'
 
     def executeAction(self, action, params):
@@ -354,7 +398,7 @@ class YoctoVoltageOutput(YoctoFunction):
         else:
             log( self._hwdid + "is offline, action canceled")
 
-    def staticInit():
+    def staticInit(self):
         YoctoVoltageOutput.capabilities.append(YDeviceAction("MOVE","Move",[YDeviceActionParam("Position",10,"V",""),YDeviceActionParam("Speed",100,"%/s",""),  ]))
         YoctoVoltageOutput.capabilities.append(YDeviceAction("TOGGLE","Toggle",[YDeviceActionParam("Position 1",0,"V",""),YDeviceActionParam("Position 2",10,"V",""),YDeviceActionParam("Speed",100,"%/s","The voltage output will toggle between position 1 & 2 at specified speed"),  ]))
 
@@ -378,7 +422,7 @@ class YoctoCurrentLoopOutput(YoctoFunction):
     def  getJsonCode(self):
         return super(YoctoCurrentLoopOutput,self).getJsonCode( "")
 
-    def getCapability():
+    def getCapability(self):
         return '"CurrentLoopOutput":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoCurrentLoopOutput.capabilities)+'}}'
 
     def executeAction(self, action, params):
@@ -407,7 +451,7 @@ class YoctoCurrentLoopOutput(YoctoFunction):
         else:
             log( self._hwdid + "is offline, action canceled")
 
-    def staticInit():
+    def staticInit(self):
         YoctoCurrentLoopOutput.capabilities.append(YDeviceAction("MOVE","Move",[YDeviceActionParam("Position",20,"mA",""),YDeviceActionParam("Speed",100,"%/s",""),  ]))
         YoctoCurrentLoopOutput.capabilities.append(YDeviceAction("TOGGLE","Toggle",[YDeviceActionParam("Position 1",4,"mA",""),YDeviceActionParam("Position 2",20,"mA",""),YDeviceActionParam("Speed",100,"%/s","The loop current will toggle between position 1 & 2 at specified speed"),  ]))
 
@@ -426,8 +470,9 @@ class  YoctoDevicesHandler:
       YAPI.RegisterDeviceArrivalCallback(self.deviceArrival)
       YAPI.RegisterDeviceRemovalCallback(self.deviceRemoval)
 
-      _thread.start_new_thread(self.yocto_bg_thread,())
-
+   def start(self):
+      thread = Thread(target = self.yocto_bg_thread,args=())
+      thread.start()
 
    def getXmlCode(self):
      res= "<YDEVICES>\n"
@@ -450,6 +495,7 @@ class  YoctoDevicesHandler:
                if  type == "Servo" :  self._flist[hwdid] = YoctoServo(hwdid,type,False,name)
                if  type == "VoltageOutput" :  self._flist[hwdid] = YoctoVoltageOutput(hwdid,type,False,name)
                if  type == "CurrentLoopOutput" :  self._flist[hwdid] = YoctoCurrentLoopOutput(hwdid,type,False,name)
+               if  type == "WakeUpMonitor" :  self._flist[hwdid] = YoctoWakeUpMonitor(hwdid,type,False,name)
 
 
    def yocto_bg_thread(self):
@@ -487,15 +533,16 @@ class  YoctoDevicesHandler:
             if  type == "CurrentLoopOutput" :
                 self._flist[id] = YoctoCurrentLoopOutput(id,type,True,"")
                 mustsave =True
+            if type == "WakeUpMonitor":
+                self._flist[id] = YoctoWakeUpMonitor(id, type, True, "")
+                mustsave = True
          else:
             self._flist[id].set_isOnline(True)
-            log("registering pouet callback for "+m.get_serialNumber())
             m.registerConfigChangeCallback(self.deviceConfigChange)
             m.triggerConfigChangeCallback()
 
          if mustsave :
             saveConfig()
-            log("registering pouet callback for "+m.get_serialNumber())
             m.registerConfigChangeCallback(self.deviceConfigChange)
 
 
@@ -544,7 +591,8 @@ class  YoctoDevicesHandler:
                                  +","+YoctoBuzzer.getCapability()\
                                  +","+YoctoServo.getCapability()\
                                  +","+YoctoVoltageOutput.getCapability()\
-                                 +","+YoctoCurrentLoopOutput.getCapability()\
+                                 +","+YoctoCurrentLoopOutput.getCapability() \
+                                 +","+YoctoWakeUpMonitor.getCapability() \
                                  +"}"
 
    def checkActionValidity(target, action, params):
@@ -561,6 +609,7 @@ class  YoctoDevicesHandler:
      if YoctoServo.checkActionValidity(targetType, action, params) : return True
      if YoctoVoltageOutput.checkActionValidity(targetType, action, params) : return True
      if YoctoCurrentLoopOutput.checkActionValidity(targetType, action, params) : return True
+     if YoctoWakeUpMonitor.checkActionValidity(targetType, action, params): return True
      return False
 
 
@@ -711,15 +760,15 @@ class  FlicButton:
        return  self._online
 
     def get_button_color(self):
-       self._handler.get_button_extrainfo(self._buttonid,   lambda bd_addr, uuid , color : self.buttoninfo_received (bd_addr, uuid , color))
+       self._handler.get_button_extrainfo(self._buttonid,   lambda bd_addr, uuid , color , serial_number, flic_version,firmware_version: self.buttoninfo_received (bd_addr, uuid , color,serial_number, flic_version,firmware_version))
 
-    def buttoninfo_received( self, bd_addr, uuid , color):
+    def buttoninfo_received( self, bd_addr, uuid , color,serial_number, flic_version,firmware_version):
        #log("bd_addr = "+bd_addr)
        #log("uuid = "+uuid)
        #log( color)
        if color is None :
-           log(id+"'s color is unknown")
-           self._color = ""
+           log(bd_addr+"'s color is unknown, using white instead")
+           self._color = "white"
            return
        self._color = color
        self.UUID = uuid
@@ -820,7 +869,8 @@ class  FlicButtons:
       if id in self._ButtonsList.keys(): self._ButtonsList[id].hold()
 
    def start(self):
-     _thread.start_new_thread(self.flic_bg_thread,())
+     thread = Thread(target=self.flic_bg_thread,args=())
+     thread.start()
      self.get_info()
 
    def scan_status(self):
@@ -917,7 +967,7 @@ class  FlicButtons:
        buttonHandler.get_info()
        self._scanning=False
 
-   def on_adv_packet(self, scanner, bd_addr, name, rssi, is_private, already_verified):
+   def on_adv_packet(self, scanner, bd_addr, name, rssi, is_private, already_verified,already_connected_to_this_device, already_connected_to_other_device ):
        #log(" *** SCAN ADV  PACKET")
        if already_verified:
           return
@@ -1029,6 +1079,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         hex= m.hexdigest();
         signature = '"checksum":"'+ hex+'"'
 
+       #  print("\n\nchecksum="+hex+" data="+l);
 
         if checksum==hex:
             l=signature
@@ -1184,7 +1235,9 @@ class YoctoConnection:
         count = m.functionCount()
         for i in range(0,count):
             if (m.functionType(i)=="Network"):
+
                url = m.get_url()
+               #print("----------[NETWORK ARRIVAL ]--->"+url)
                p = url.index("://")
                if p>0 : url=url[p+3:]
                p = url.index(":")
@@ -1294,8 +1347,11 @@ def run():
     YoctoServo.staticInit()
     YoctoVoltageOutput.staticInit()
     YoctoCurrentLoopOutput.staticInit()
+    YoctoWakeUpMonitor.staticInit()
 
     log("Welcome to yocto-Flic, a Flic buttons to Yoctopuce devices bridge")
+    log("Now compatible with Flic2")
+
     log("Command line parameters")
     log(" -config configfile        default is "+configfilename)
     log(" -ip serverBindingAddress  default is first interface found ("+serverIP+")")
@@ -1337,6 +1393,8 @@ def run():
         if child.tag=="YDEVICES":  yoctoHandler.initFromXml(child)
 
     buttonHandler.start()
+
+    yoctoHandler.start()
 
     # Server settings
     # Choose port 8080, for port 80, which is normally used for a http server, you need root access

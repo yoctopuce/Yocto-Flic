@@ -45,9 +45,3 @@ Then use a web browser to connect the Raspberry running the script (port 8081).
 Usage is supposed to be pretty straight forward: just pair some button, add addresses of some YoctoHub or VirtualHub connected to compatible devices, compatible functions will be automatically listed. Then configure buttons _Click_, _Double click_ and _Hold_  actions.  Here are the main points of the user interface: 
 
 ![UI description](http://www.yoctopuce.com/pubarchive/2019-05/UI-description_2.png)
-
-
-
-
- 
-
