@@ -204,7 +204,8 @@ class YoctoRelay(YoctoFunction):
        else:
             log( self._hwdid + "is offline, action canceled")
 
-   def staticInit(self):
+   @staticmethod
+   def staticInit():
        YoctoRelay.capabilities.append(YDeviceAction("TOGGLE","Toggle",None))
        YoctoRelay.capabilities.append(YDeviceAction("SWITCHB","Switch to B",None))
        YoctoRelay.capabilities.append(YDeviceAction("SWITCHA","Switch to A",None))
@@ -247,7 +248,8 @@ class YoctoWakeUpMonitor(YoctoFunction):
        else:
             log( self._hwdid + "is offline, action canceled")
 
-   def staticInit(self):
+   @staticmethod
+   def staticInit():
        YoctoWakeUpMonitor.capabilities.append(YDeviceAction("SLEEP","Sleep",None))
        YoctoWakeUpMonitor.capabilities.append(YDeviceAction("SLEEPFOR","Sleep for",[YDeviceActionParam("Duration",3600,"s","")]))
 
@@ -287,7 +289,8 @@ class YoctoBuzzer(YoctoFunction):
         else:
             log( self._hwdid + "is offline, action canceled")
 
-    def staticInit(self):
+    @staticmethod
+    def staticInit():
         YoctoBuzzer.capabilities.append(YDeviceAction("PULSE","Pulse",[YDeviceActionParam("Frequence",1000,"Hz",""),YDeviceActionParam("Duration",1500,"ms",""),  ]))
         YoctoBuzzer.capabilities.append(YDeviceAction("PLAY","Play tune",[YDeviceActionParam("Notes","200% D8! C! D! A! F! A! ,D4! ","","Tune to play, more info about syntax on <a href='http://http://www.yoctopuce.com/EN/article/fancy-ringtones-for-the-yocto-buzzer'>Yoctopuce web site</a>.")]))
 
@@ -345,7 +348,8 @@ class YoctoServo(YoctoFunction):
         else:
             log( self._hwdid + "is offline, action canceled")
 
-    def staticInit(self):
+    @staticmethod
+    def staticInit():
         YoctoServo.capabilities.append(YDeviceAction("MOVE","Move",[YDeviceActionParam("Position",1000,"",""),YDeviceActionParam("Speed",100,"%/s",""),  ]))
         YoctoServo.capabilities.append(YDeviceAction("TOGGLE","Toggle",[YDeviceActionParam("Position 1",-1000,"",""),YDeviceActionParam("Position 2",1000,"",""),YDeviceActionParam("Speed",100,"%/s","The servo will toggle between position 1 & 2 at specified speed"),  ]))
 
@@ -398,7 +402,8 @@ class YoctoVoltageOutput(YoctoFunction):
         else:
             log( self._hwdid + "is offline, action canceled")
 
-    def staticInit(self):
+    @staticmethod
+    def staticInit():
         YoctoVoltageOutput.capabilities.append(YDeviceAction("MOVE","Move",[YDeviceActionParam("Position",10,"V",""),YDeviceActionParam("Speed",100,"%/s",""),  ]))
         YoctoVoltageOutput.capabilities.append(YDeviceAction("TOGGLE","Toggle",[YDeviceActionParam("Position 1",0,"V",""),YDeviceActionParam("Position 2",10,"V",""),YDeviceActionParam("Speed",100,"%/s","The voltage output will toggle between position 1 & 2 at specified speed"),  ]))
 
@@ -451,7 +456,8 @@ class YoctoCurrentLoopOutput(YoctoFunction):
         else:
             log( self._hwdid + "is offline, action canceled")
 
-    def staticInit(self):
+    @staticmethod
+    def staticInit():
         YoctoCurrentLoopOutput.capabilities.append(YDeviceAction("MOVE","Move",[YDeviceActionParam("Position",20,"mA",""),YDeviceActionParam("Speed",100,"%/s",""),  ]))
         YoctoCurrentLoopOutput.capabilities.append(YDeviceAction("TOGGLE","Toggle",[YDeviceActionParam("Position 1",4,"mA",""),YDeviceActionParam("Position 2",20,"mA",""),YDeviceActionParam("Speed",100,"%/s","The loop current will toggle between position 1 & 2 at specified speed"),  ]))
 
