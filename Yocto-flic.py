@@ -187,7 +187,7 @@ class YoctoRelay(YoctoFunction):
    def  getJsonCode(self):
       return super(YoctoRelay,self).getJsonCode( "")
 
-   def getCapability(self):
+   def getCapability():
 
       return '"Relay":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoRelay.capabilities)+'}}'
 
@@ -232,7 +232,7 @@ class YoctoWakeUpMonitor(YoctoFunction):
    def  getJsonCode(self):
       return super(YoctoWakeUpMonitor,self).getJsonCode( "")
 
-   def getCapability(self):
+   def getCapability():
 
       return '"WakeUpMonitor":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoWakeUpMonitor.capabilities)+'}}'
 
@@ -275,7 +275,7 @@ class YoctoBuzzer(YoctoFunction):
     def  getJsonCode(self):
         return super(YoctoBuzzer,self).getJsonCode( "")
 
-    def getCapability(self):
+    def getCapability():
         return '"Buzzer":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoBuzzer.capabilities)+'}}'
 
     def executeAction(self, action, params):
@@ -318,7 +318,7 @@ class YoctoServo(YoctoFunction):
     def  getJsonCode(self):
         return super(YoctoServo,self).getJsonCode( "")
 
-    def getCapability(self):
+    def getCapability():
         return '"Servo":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoServo.capabilities)+'}}'
 
     def executeAction(self, action, params):
@@ -373,7 +373,7 @@ class YoctoVoltageOutput(YoctoFunction):
     def  getJsonCode(self):
         return super(YoctoVoltageOutput,self).getJsonCode( "")
 
-    def getCapability(self):
+    def getCapability():
         return '"VoltageOutput":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoVoltageOutput.capabilities)+'}}'
 
     def executeAction(self, action, params):
@@ -427,7 +427,7 @@ class YoctoCurrentLoopOutput(YoctoFunction):
     def  getJsonCode(self):
         return super(YoctoCurrentLoopOutput,self).getJsonCode( "")
 
-    def getCapability(self):
+    def getCapability():
         return '"CurrentLoopOutput":{"actions":{'+YoctoFunction.capabilitiesToJson(YoctoCurrentLoopOutput.capabilities)+'}}'
 
     def executeAction(self, action, params):
